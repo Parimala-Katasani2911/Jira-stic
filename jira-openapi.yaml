@@ -1,0 +1,145 @@
+openapi: 3.0.1
+info:
+  title: Jira MCP REST API
+  description: REST API to interact with Jira for issue management, compatible with Copilot Studio
+  version: 1.0.0
+servers:
+  - url: https://your-app-name.azurewebsites.net  # Replace with your deployed URL
+paths:
+  /create-issue:
+    post:
+      summary: Create a new Jira issue
+      operationId: createIssue
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - projectKey
+                - summary
+                - issueType
+              properties:
+                projectKey:
+                  type: string
+                  example: TEST
+                summary:
+                  type: string
+                  example: Fix login bug
+                issueType:
+                  type: string
+                  example: Bug
+                description:
+                  type: string
+                  example: User unable to log in from mobile.
+                assignee:
+                  type: string
+                  example: jdoe@example.com
+                labels:
+                  type: array
+                  items:
+                    type: string
+                  example: ["bug", "urgent"]
+                components:
+                  type: array
+                  items:
+                    type: string
+                  example: ["Authentication"]
+                priority:
+                  type: string
+                  example: High
+                parent:
+                  type: string
+                  example: TEST-100
+                reporter:
+                  type: string
+                  example: admin@example.com
+      responses:
+        '200':
+          description: Issue created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  issue:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      key:
+                        type: string
+                      url:
+                        type: string
+        '500':
+          description: Jira error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /get-issues:
+    get:
+      summary: Get all issues and subtasks for a Jira project
+      operationId: getIssues
+      parameters:
+        - in: query
+          name: projectKey
+          required: true
+          schema:
+            type: string
+          description: Jira project key (e.g., TEST)
+        - in: query
+          name: jql
+          required: false
+          schema:
+            type: string
+          description: Optional JQL filter expression
+      responses:
+        '200':
+          description: List of issues
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  issues:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        key:
+                          type: string
+                        summary:
+                          type: string
+                        status:
+                          type: string
+                        priority:
+                          type: string
+                        assignee:
+                          type: string
+                        issueType:
+                          type: string
+                        parent:
+                          type: string
+                        subtasks:
+                          type: array
+                          items:
+                            type: string
+                        url:
+                          type: string
+        '500':
+          description: Jira query error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
